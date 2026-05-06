@@ -1,0 +1,423 @@
+﻿Compiling lib\main.dart for the Web...                          
+flutter : Wasm dry run 
+findings:
+At line:1 char:1
++ flutter build web 2>&1 | 
+Out-File -Encoding UTF8 
+C:\Users\tk854\Deskt ...
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Wasm dr  
+  y run findings::String)    
+ [], RemoteException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+Found incompatibilities with 
+WebAssembly.
+
+package:isar/src/native/isar_
+core.dart 4:1 - 'dart:ffi' 
+can't be imported when 
+compiling to Wasm. (2)
+package:isar/src/native/isar_
+link_impl.dart 3:1 - 
+'dart:ffi' can't be imported 
+when compiling to Wasm. (2)
+package:isar/src/native/open.
+dart 4:1 - 'dart:ffi' can't 
+be imported when compiling 
+to Wasm. (2)
+package:isar/src/native/split
+_words.dart 1:1 - 'dart:ffi' 
+can't be imported when 
+compiling to Wasm. (2)
+package:isar/src/native/bindi
+ngs.dart 6:1 - 'dart:ffi' 
+can't be imported when 
+compiling to Wasm. (2)
+package:isar/src/native/isar_
+collection_impl.dart 5:1 - 
+'dart:ffi' can't be imported 
+when compiling to Wasm. (2)
+package:isar/src/native/txn.d
+art 3:1 - 'dart:ffi' can't 
+be imported when compiling 
+to Wasm. (2)
+package:isar/src/native/encod
+e_string.dart 1:1 - 
+'dart:ffi' can't be imported 
+when compiling to Wasm. (2)
+package:isar/src/native/isar_
+impl.dart 4:1 - 'dart:ffi' 
+can't be imported when 
+compiling to Wasm. (2)
+package:ffi/src/allocation.da
+rt 5:1 - 'dart:ffi' can't be 
+imported when compiling to 
+Wasm. (2)
+package:ffi/src/arena.dart 
+8:1 - 'dart:ffi' can't be 
+imported when compiling to 
+Wasm. (2)
+package:ffi/src/utf16.dart 
+5:1 - 'dart:ffi' can't be 
+imported when compiling to 
+Wasm. (2)
+package:ffi/src/utf8.dart 
+6:1 - 'dart:ffi' can't be 
+imported when compiling to 
+Wasm. (2)
+package:isar/src/native/index
+_key.dart 3:1 - 'dart:ffi' 
+can't be imported when 
+compiling to Wasm. (2)
+package:isar/src/native/query
+_build.dart 3:1 - 'dart:ffi' 
+can't be imported when 
+compiling to Wasm. (2)
+package:isar/src/native/query
+_impl.dart 4:1 - 'dart:ffi' 
+can't be imported when 
+compiling to Wasm. (2)
+
+Consider addressing these 
+issues to enable wasm 
+builds. See docs for more 
+info: https://docs.flutter.de
+v/platform-integration/web/wa
+sm
+
+Use --no-wasm-dry-run to 
+disable these warnings.
+Target dart2js failed: 
+ProcessException: Process 
+exited abnormally with exit 
+code 1:
+lib/data/isar/isar_models.g.d
+art:18:8:
+Error: The integer literal 
+1179651731391696624 can't be 
+represented exactly in 
+JavaScript.
+  id: -1179651731391696624,
+       ^^^^^^^^^^^^^^^^^^^
+lib/data/isar/isar_models.g.d
+art:58:12:
+Error: The integer literal 
+7892941694082631125 can't be 
+represented exactly in 
+JavaScript.
+      id: 
+-7892941694082631125,
+           
+^^^^^^^^^^^^^^^^^^^
+lib/data/isar/isar_models.g.d
+art:71:11:
+Error: The integer literal 
+185569196879461423 can't be 
+represented exactly in 
+JavaScript.
+      id: 185569196879461423,
+          ^^^^^^^^^^^^^^^^^^
+lib/data/isar/isar_models.g.d
+art:84:11:
+Error: The integer literal 
+6586771860058994318 can't be 
+represented exactly in 
+JavaScript.
+      id: 
+6586771860058994318,
+          ^^^^^^^^^^^^^^^^^^^
+lib/data/isar/isar_models.g.d
+art:97:12:
+Error: The integer literal 
+8320474698168289341 can't be 
+represented exactly in 
+JavaScript.
+      id: 
+-8320474698168289341,
+           
+^^^^^^^^^^^^^^^^^^^
+lib/data/isar/isar_models.g.d
+art:1976:7:
+Error: The integer literal 
+1299079627590655307 can't be 
+represented exactly in 
+JavaScript.
+  id: 1299079627590655307,
+      ^^^^^^^^^^^^^^^^^^^
+lib/data/isar/isar_models.g.d
+art:2016:12:
+Error: The integer literal 
+7892941694082631125 can't be 
+represented exactly in 
+JavaScript.
+      id: 
+-7892941694082631125,
+           
+^^^^^^^^^^^^^^^^^^^
+lib/data/isar/isar_models.g.d
+art:2029:12:
+Error: The integer literal 
+119658973594151740 can't be 
+represented exactly in 
+JavaScript.
+      id: 
+-119658973594151740,
+           ^^^^^^^^^^^^^^^^^^
+lib/data/isar/isar_models.g.d
+art:2042:11:
+Error: The integer literal 
+6165951699865175843 can't be 
+represented exactly in 
+JavaScript.
+      id: 
+6165951699865175843,
+          ^^^^^^^^^^^^^^^^^^^
+lib/data/isar/isar_models.g.d
+art:2055:11:
+Error: The integer literal 
+7306667881018231209 can't be 
+represented exactly in 
+JavaScript.
+      id: 
+7306667881018231209,
+          ^^^^^^^^^^^^^^^^^^^
+lib/data/isar/isar_models.g.d
+art:2068:12:
+Error: The integer literal 
+1027996372147428349 can't be 
+represented exactly in 
+JavaScript.
+      id: 
+-1027996372147428349,
+           
+^^^^^^^^^^^^^^^^^^^
+lib/data/isar/isar_models.g.d
+art:4180:7:
+Error: The integer literal 
+4634539686431133545 can't be 
+represented exactly in 
+JavaScript.
+  id: 4634539686431133545,
+      ^^^^^^^^^^^^^^^^^^^
+lib/data/isar/isar_models.g.d
+art:4200:11:
+Error: The integer literal 
+3874849906276205956 can't be 
+represented exactly in 
+JavaScript.
+      id: 
+3874849906276205956,
+          ^^^^^^^^^^^^^^^^^^^
+lib/data/isar/isar_models.g.d
+art:4858:7:
+Error: The integer literal 
+2810775686564181443 can't be 
+represented exactly in 
+JavaScript.
+  id: 2810775686564181443,
+      ^^^^^^^^^^^^^^^^^^^
+lib/data/isar/isar_models.g.d
+art:4878:11:
+Error: The integer literal 
+879695947855722453 can't be 
+represented exactly in 
+JavaScript.
+      id: 879695947855722453,
+          ^^^^^^^^^^^^^^^^^^
+lib/data/isar/isar_models.g.d
+art:4893:12:
+Error: The integer literal 
+4604503684550322922 can't be 
+represented exactly in 
+JavaScript.
+      id: 
+-4604503684550322922,
+           
+^^^^^^^^^^^^^^^^^^^
+lib/data/isar/isar_models.g.d
+art:5658:8:
+Error: The integer literal 
+6588628299822617142 can't be 
+represented exactly in 
+JavaScript.
+  id: -6588628299822617142,
+       ^^^^^^^^^^^^^^^^^^^
+lib/data/isar/isar_models.g.d
+art:5688:11:
+Error: The integer literal 
+3874849906276205956 can't be 
+represented exactly in 
+JavaScript.
+      id: 
+3874849906276205956,
+          ^^^^^^^^^^^^^^^^^^^
+lib/data/isar/isar_models.g.d
+art:6629:7:
+Error: The integer literal 
+4040007429963721947 can't be 
+represented exactly in 
+JavaScript.
+  id: 4040007429963721947,
+      ^^^^^^^^^^^^^^^^^^^
+lib/data/isar/isar_models.g.d
+art:6654:12:
+Error: The integer literal 
+1917949875430644359 can't be 
+represented exactly in 
+JavaScript.
+      id: 
+-1917949875430644359,
+           
+^^^^^^^^^^^^^^^^^^^
+Error: Compilation failed.
+  Command: C:\flutter\bin\cac
+he\dart-sdk\bin\dart.exe 
+compile js --platform-binarie
+s=C:\flutter\bin\cache\flutte
+r_web_sdk\kernel 
+--invoker=flutter_tool 
+-Ddart.vm.product=true 
+-DFLUTTER_VERSION=3.41.2 
+-DFLUTTER_CHANNEL=stable -DFL
+UTTER_GIT_URL=https://github.
+com/flutter/flutter.git -DFLU
+TTER_FRAMEWORK_REVISION=90673
+a4eef -DFLUTTER_ENGINE_REVISI
+ON=6c0baaebf7 -DFLUTTER_DART_
+VERSION=3.11.0 
+-DFLUTTER_WEB_USE_SKIA=true -
+DFLUTTER_WEB_USE_SKWASM=false
+ -DFLUTTER_WEB_CANVASKIT_URL=
+https://www.gstatic.com/flutt
+er-canvaskit/6c0baaebf70e0148
+f485f27d5616b3d3382da7bf/ 
+--native-null-assertions 
+--no-source-maps -O4 
+--minify -o C:\Users\tk854\De
+sktop\app\shahihmuslim\.dart_
+tool\flutter_build\bd427ac2c7
+ab0b3a50f3092360902ba2\app.di
+ll --packages=C:\Users\tk854\
+Desktop\app\shahihmuslim\.dar
+t_tool\package_config.json 
+--cfe-only C:\Users\tk854\Des
+ktop\app\shahihmuslim\.dart_t
+ool\flutter_build\bd427ac2c7a
+b0b3a50f3092360902ba2\main.da
+rt
+#0      
+RunResult.throwException (pac
+kage:flutter_tools/src/base/p
+rocess.dart:153:5)
+#1      
+_DefaultProcessUtils.run (pac
+kage:flutter_tools/src/base/p
+rocess.dart:379:19)
+<asynchronous suspension>
+#2      Dart2JSTarget.build (
+package:flutter_tools/src/bui
+ld_system/targets/web.dart:20
+8:5)
+<asynchronous suspension>
+#3      _BuildInstance._invok
+eInternal (package:flutter_to
+ols/src/build_system/build_sy
+stem.dart:937:9)
+<asynchronous suspension>
+#4      
+Future.wait.<anonymous 
+closure> (dart:async/future.d
+art:546:21)
+<asynchronous suspension>
+#5      
+_BuildInstance.invokeTarget (
+package:flutter_tools/src/bui
+ld_system/build_system.dart:8
+75:32)
+<asynchronous suspension>
+#6      
+Future.wait.<anonymous 
+closure> (dart:async/future.d
+art:546:21)
+<asynchronous suspension>
+#7      
+_BuildInstance.invokeTarget (
+package:flutter_tools/src/bui
+ld_system/build_system.dart:8
+75:32)
+<asynchronous suspension>
+#8      
+FlutterBuildSystem.build (pac
+kage:flutter_tools/src/build_
+system/build_system.dart:684:
+16)
+<asynchronous suspension>
+#9      WebBuilder.buildWeb (
+package:flutter_tools/src/web
+/compile.dart:107:34)
+<asynchronous suspension>
+#10     
+BuildWebCommand.runCommand (p
+ackage:flutter_tools/src/comm
+ands/build_web.dart:300:5)
+<asynchronous suspension>
+#11     FlutterCommand.run.<a
+nonymous closure> (package:fl
+utter_tools/src/runner/flutte
+r_command.dart:1590:27)
+<asynchronous suspension>
+#12     
+AppContext.run.<anonymous 
+closure> (package:flutter_too
+ls/src/base/context.dart:154:
+19)
+Compiling lib\main.dart for the Web...                            148.8s
+<asynchronous suspension>
+#13     
+CommandRunner.runCommand (pac
+kage:args/command_runner.dart
+:212:13)
+<asynchronous suspension>
+#14     FlutterCommandRunner.
+runCommand.<anonymous 
+closure> (package:flutter_too
+ls/src/runner/flutter_command
+_runner.dart:496:9)
+<asynchronous suspension>
+#15     
+AppContext.run.<anonymous 
+closure> (package:flutter_too
+ls/src/base/context.dart:154:
+19)
+<asynchronous suspension>
+#16     FlutterCommandRunner.
+runCommand (package:flutter_t
+ools/src/runner/flutter_comma
+nd_runner.dart:431:5)
+<asynchronous suspension>
+#17     FlutterCommandRunner.
+run.<anonymous closure> (pack
+age:flutter_tools/src/runner/
+flutter_command_runner.dart:3
+07:33)
+<asynchronous suspension>
+#18     run.<anonymous 
+closure>.<anonymous closure> 
+(package:flutter_tools/runner
+.dart:104:11)
+<asynchronous suspension>
+#19     
+AppContext.run.<anonymous 
+closure> (package:flutter_too
+ls/src/base/context.dart:154:
+19)
+<asynchronous suspension>
+#20     main (package:flutter
+_tools/executable.dart:103:3)
+<asynchronous suspension>
+
+Error: Failed to compile 
+application for the Web.
