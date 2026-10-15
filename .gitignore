@@ -48,4 +48,12 @@ app.*.map.json
 android/app/key.properties
 android/app/*.jks
 android/key.properties
+android/*.jks
+key.properties
+*.jks
 
+
+
+.gradle_build_home/
+.gradle/
+scratch/

@@ -3,6 +3,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/ads/ad_service.dart';
+import '../../core/services/in_app_review_service.dart';
+import '../../core/services/notification_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -65,15 +68,27 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     super.dispose();
   }
 
-  void _navigateToHome() async {
-    await Future.delayed(const Duration(milliseconds: 3500));
-    if (mounted) {
-      final prefs = await SharedPreferences.getInstance();
-      final onboardingDone = prefs.getBool('onboarding_done') ?? false;
-      if (mounted) {
-        context.go(onboardingDone ? '/home' : '/onboarding');
-      }
-    }
+  Future<void> _navigateToHome() async {
+    final results = await Future.wait([
+      Future.delayed(const Duration(milliseconds: 2500)),
+      SharedPreferences.getInstance(),
+      AdService.gatherConsentAndInitialize().timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          debugPrint('AdService.gatherConsentAndInitialize timed out on splash.');
+          return AdService.canRequestAds;
+        },
+      ),
+      InAppReviewService.recordAppOpen(),
+    ]);
+
+    // Zero-overhead background notification scheduling
+    NotificationService.initialize();
+
+    if (!mounted) return;
+    final prefs = results[1] as SharedPreferences;
+    final onboardingDone = prefs.getBool('onboarding_done') ?? false;
+    context.go(onboardingDone ? '/home' : '/language-select');
   }
 
   @override
@@ -288,9 +303,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
               const SizedBox(height: 20),
 
-              // Version — FIXED: matches pubspec.yaml version 1.3.0+4
+              // Version — kept in sync with pubspec.yaml version 1.4.5+10
               Text(
-                'v1.3.0',
+                'v1.4.5',
                 style: GoogleFonts.rubik(
                   fontSize: 11,
                   color: Colors.white.withValues(alpha: 0.35),

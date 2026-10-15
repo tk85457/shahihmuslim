@@ -1,0 +1,101 @@
+[
+  {
+    "id": 336887974639,
+    "name": "ChatGPT",
+    "package_name": "com.openai.chatgpt",
+    "developer": "OpenAI",
+    "store": "google_play",
+    "release_date": "2023-07-20T20:10:07",
+    "icon": "https://play-lh.googleusercontent.com/T9J8e9oxxPd600j_KPM4KK2GHfNpUpGBdTy8lHPXBXpOUfGusRuZXj0UMgFNrP8we6LVt9V-AibEgcLootE6VK4",
+    "downloads_90d": 0,
+    "uninstalls_90d": 0
+  },
+  {
+    "id": 338525564244,
+    "name": "Sahih Bukhari Hadith Offline",
+    "package_name": "com.albukhari.hadith",
+    "developer": "Taha imam",
+    "store": "google_play",
+    "release_date": "2026-04-20T04:32:33",
+    "icon": "https://play-lh.googleusercontent.com/_cV_8iehIZJDBzUB2IV6xnkd8vr_xIMvvpP3K-BrlgVK0jIsAE2JGCONQjpL5EBuo8zBYqyLDHbJ_FnKv08z",
+    "downloads_90d": 3056,
+    "uninstalls_90d": 1643
+  },
+  {
+    "id": 338539849429,
+    "name": "Sahih Muslim Ultimate",
+    "package_name": "app.shahihmuslim",
+    "developer": "Taha imam",
+    "store": "google_play",
+    "release_date": "2026-05-06T16:25:18",
+    "icon": "https://play-lh.googleusercontent.com/7FyrPhIBmPISvp1JdE5HxOgfArn_WpcqvPahgEjq9SWUrQJ4Gp65pMAWGgdZxpotTJN1hA83CyqXkTozECjX",
+    "downloads_90d": 235,
+    "uninstalls_90d": 174
+  },
+  {
+    "id": 338542119254,
+    "name": "Sunan Ibn Majah - Hadith",
+    "package_name": "com.sunan.ibnmajah",
+    "developer": "Taha imam",
+    "store": "google_play",
+    "release_date": "2026-05-10T12:26:19",
+    "icon": "https://play-lh.googleusercontent.com/JV6ZL5IMfZgdOdCfTU0gSy7NJ8Qb8YaO-B98UbeHZZFSxx0eQzW8A0ZMi4oyr6JgLxnRQzxk1d_jsmnpyx4aUcM",
+    "downloads_90d": 89,
+    "uninstalls_90d": 37
+  },
+  {
+    "id": 338573870290,
+    "name": "Sunan Abu Dawood-All Languages",
+    "package_name": "com.sunan.abudawood",
+    "developer": "Taha imam",
+    "store": "google_play",
+    "release_date": "2026-06-10T18:24:37",
+    "icon": "https://play-lh.googleusercontent.com/p6lgEgzSbzebpeovvPn7M9HS94lqNBj6hS-68IMkJeb2RyVhVNFjTWE5o41KO_Xk_tdVfX4bMSjcnxPlrIILTA",
+    "downloads_90d": 59,
+    "uninstalls_90d": 29
+  },
+  {
+    "id": 338586159569,
+    "name": "CalcX Pro",
+    "package_name": "com.tk854.calcxpro",
+    "developer": "Taha imam",
+    "store": "google_play",
+    "release_date": "2026-06-26T00:44:34",
+    "icon": "https://play-lh.googleusercontent.com/zoiEXX1DcSlkz5QfATimM9X3OmfLgd0-u9d_m7LFG_UbzhhMKKcPBh-nN2EyNV1-CuALdlMPQKufQdhjnQTIXA",
+    "downloads_90d": 4,
+    "uninstalls_90d": 6
+  },
+  {
+    "id": 338611878938,
+    "name": "Jami at-Tirmidhi Hadith",
+    "package_name": "com.jami.at_tirmidhi",
+    "developer": "Taha imam",
+    "store": "google_play",
+    "release_date": "2026-07-26T05:54:07",
+    "icon": "https://play-lh.googleusercontent.com/vuJaJzZ2xa_-0btKPvXhqW2xI2W1haSpRQnJhuSmSS-c1QZVcXWIUk-S_5m52qYYHO82QSlTq59Iz2gAu9AnXQ",
+    "downloads_90d": 168,
+    "uninstalls_90d": 100
+  },
+  {
+    "id": 338611878939,
+    "name": "SmartCart - AI Shopping List",
+    "package_name": "com.list.listonic",
+    "developer": "",
+    "store": "google_play",
+    "release_date": "2026-07-26T05:54:07",
+    "icon": "https://lh3.googleusercontent.com/NbuXFyZvRoXMLJK38d0o5dAjbWIi72lDKxk94dYc1DRIIRB7xO4VAt0g2Fn-UBL5JeXo8IeUkh4tOLbq533vzw",
+    "downloads_90d": 14,
+    "uninstalls_90d": 19
+  },
+  {
+    "id": 338611878940,
+    "name": "Sunan An-Nasai (3 Languages)",
+    "package_name": "com.sunan.an_nasai",
+    "developer": "Taha imam",
+    "store": "google_play",
+    "release_date": "2026-07-26T05:54:08",
+    "icon": "https://play-lh.googleusercontent.com/74h0sLqY67p6liUwwtMYGl5hDpCUE5Z-Ofb4ijVAtfZ_iIYRS8jzC-fdcJGqUZGAlulUImd9C0yDXT7kPJjOxw",
+    "downloads_90d": 28,
+    "uninstalls_90d": 11
+  }
+]

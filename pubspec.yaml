@@ -1,7 +1,7 @@
 name: shahihmuslim
 description: "Sahih Muslim — Production Hadith App"
 publish_to: 'none'
-version: 1.4.2+7
+version: 1.4.8+13
 
 environment:
   sdk: ^3.10.7
@@ -22,6 +22,11 @@ dependencies:
   shimmer: ^3.0.0
   sqflite_common_ffi: ^2.4.0+2
   sqflite_common_ffi_web: ^1.1.1
+  in_app_review: ^2.0.12
+  url_launcher: ^6.3.1
+  google_mobile_ads: ^5.3.1
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.10.0
 
 dev_dependencies:
   flutter_test:
@@ -38,8 +43,8 @@ flutter_launcher_icons:
   ios: true
   image_path: "assets/icon/icon.png"
   min_sdk_android: 21
-  adaptive_icon_background: "#1A237E"
-  adaptive_icon_foreground: "assets/icon/icon.png"
+  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: "assets/icon/adaptive_foreground.png"
 
 flutter_native_splash:
   color: "#1A237E"

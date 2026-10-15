@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../theme/app_theme.dart';
 import '../../data/repositories/hadith_repository.dart';
 import '../../domain/models/models.dart';
@@ -11,7 +12,10 @@ import '../settings/settings_provider.dart';
 import '../collections/collections_screen.dart';
 import '../collections/collection_detail_screen.dart';
 import '../hadith/hadith_list_screen.dart'; // To access singleChapterProvider
+import '../bookmarks/bookmarks_screen.dart'; // For bookmarkedHadithsProvider
+import '../notes/notes_screen.dart'; // For allNotesWithInfoProvider
 import 'share_image_screen.dart';
+import '../../core/services/in_app_review_service.dart';
 
 final hadithsByChapterProvider = FutureProvider.family<List<Hadith>, int>((
   ref,
@@ -62,6 +66,24 @@ class _HadithDetailScreenState extends ConsumerState<HadithDetailScreen> {
     super.initState();
     _currentIndex = widget.startIndex;
     _pageController = PageController(initialPage: widget.startIndex);
+
+    // Save initial open as reading progress immediately
+    _saveProgress();
+
+    // Prompt review on 2nd detail visit (with 3-day cooldown if dismissed/cancelled)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        InAppReviewService.checkPromptOnHadithDetail();
+      }
+    });
+  }
+
+  void _onHadithViewed() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        InAppReviewService.incrementHadithReadAndCheckPrompt(context);
+      }
+    });
   }
 
   @override
@@ -74,6 +96,10 @@ class _HadithDetailScreenState extends ConsumerState<HadithDetailScreen> {
     final repo = ref.read(hadithRepositoryProvider);
     repo.saveReadingProgress(widget.chapterId, _currentIndex).then((_) {
       if (mounted) ref.invalidate(lastProgressProvider);
+    });
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setInt('last_read_chapter_id', widget.chapterId);
+      prefs.setInt('last_read_hadith_index', _currentIndex);
     });
     // Record reading streak
     repo.recordReadingDay();
@@ -100,7 +126,12 @@ class _HadithDetailScreenState extends ConsumerState<HadithDetailScreen> {
       error: (_, _) => 'صحیح مسلم',
     );
 
-    return Scaffold(
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        _saveProgress();
+      },
+      child: Scaffold(
       appBar: AppBar(
         // FIXED: Show actual chapter title, not "Chapter 5"
         title: Text(
@@ -167,6 +198,7 @@ class _HadithDetailScreenState extends ConsumerState<HadithDetailScreen> {
           return _buildHadithView(hadiths, hadiths.length, settings, isDark);
         },
       ),
+    ),
     );
   }
 
@@ -273,6 +305,7 @@ class _HadithDetailScreenState extends ConsumerState<HadithDetailScreen> {
                 _currentIndex = index;
               });
               _saveProgress(); // CORRECT: only save when user actually swipes
+              _onHadithViewed();
             },
             itemBuilder: (context, index) {
               final activeHadith = hadiths[index];
@@ -732,8 +765,12 @@ class _HadithDetailScreenState extends ConsumerState<HadithDetailScreen> {
   }
 
   Widget _buildActionBar(Hadith hadith, bool isDark) {
+    // FIXED: Add bottom safe-area padding so the system navigation bar
+    // (3-button nav or gesture bar on edge-to-edge devices) does not
+    // overlap/cover these action buttons (bookmark, copy, share, note, collect).
+    final bottomInset = MediaQuery.of(context).padding.bottom;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+      padding: EdgeInsets.only(left: 4, right: 4, top: 6, bottom: 6 + bottomInset),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.cardDark : Colors.white,
         boxShadow: [
@@ -764,6 +801,7 @@ class _HadithDetailScreenState extends ConsumerState<HadithDetailScreen> {
                   final wasBookmarked = await repo.isBookmarked(hadith.id);
                   await repo.toggleBookmark(hadith.id);
                   ref.invalidate(isBookmarkedProvider(hadith.id));
+                  ref.invalidate(bookmarkedHadithsProvider);
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -1017,6 +1055,7 @@ class _HadithDetailScreenState extends ConsumerState<HadithDetailScreen> {
               if (controller.text.isNotEmpty) {
                 final repo = ref.read(hadithRepositoryProvider);
                 await repo.addNote(hadith.id, controller.text);
+                ref.invalidate(allNotesWithInfoProvider);
                 if (ctx.mounted) Navigator.pop(ctx);
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(

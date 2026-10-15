@@ -5,11 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../theme/app_theme.dart';
 import '../../data/repositories/hadith_repository.dart';
 import '../../domain/models/models.dart';
 import '../settings/settings_provider.dart';
 import '../common/widgets/shimmer_loading.dart';
+import '../../core/ads/ad_service.dart';
 
 final chaptersProvider = FutureProvider<List<Chapter>>((ref) async {
   final repo = ref.watch(hadithRepositoryProvider);
@@ -76,6 +78,29 @@ class HomeScreen extends ConsumerWidget {
         ),
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.volunteer_activism, color: Colors.amber),
+            tooltip: 'Support App (Watch Ad)',
+            onPressed: () {
+              HapticFeedback.heavyImpact();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Loading Rewarded Ad... Thank you! 💚'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+              AdService.showRewardedAd(
+                onUserEarnedReward: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('JazakAllah Khair! Thank you for supporting the app! 💚'),
+                      backgroundColor: Color(0xFF0A7E47),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
@@ -824,8 +849,6 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _buildResumeButton(BuildContext context, WidgetRef ref, bool isDark) {
-    final progressAsync = ref.watch(lastProgressProvider);
-
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 60),
       child: Material(
@@ -835,20 +858,27 @@ class HomeScreen extends ConsumerWidget {
         shadowColor: Theme.of(context).primaryColor.withValues(alpha: 0.3),
         child: InkWell(
           borderRadius: BorderRadius.circular(30),
-          onTap: () {
-            progressAsync.whenData((progress) {
-              if (progress != null) {
-                context.go(
-                  '/home/chapter/${progress.chapterId}?startIndex=${progress.hadithIndex}',
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Start reading a hadith to enable resume!'),
-                  ),
-                );
-              }
-            });
+          onTap: () async {
+            HapticFeedback.lightImpact();
+            final repo = ref.read(hadithRepositoryProvider);
+            final progress = await repo.getLastReadingProgress();
+
+            // Safe fallback to SharedPreferences
+            final prefs = await SharedPreferences.getInstance();
+            final spChapter = prefs.getInt('last_read_chapter_id');
+            final spIndex = prefs.getInt('last_read_hadith_index');
+
+            final chapterId = progress?.chapterId ?? spChapter ?? 1;
+            final startIndex = progress?.hadithIndex ?? spIndex ?? 0;
+
+            if (context.mounted) {
+              await context.push(
+                '/home/chapter/$chapterId?startIndex=$startIndex',
+              );
+              // Invalidate progress on return to refresh dashboard/button
+              ref.invalidate(lastProgressProvider);
+              ref.invalidate(chapterProgressProvider);
+            }
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),

@@ -79,4 +79,28 @@ flutter {
 dependencies {
     implementation("androidx.activity:activity-ktx:1.11.0")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+
+    // Google Mobile Ads Mediation Adapters & SDKs
+    // Unity Ads SDK + Official Google AdMob Adapter
+    implementation("com.unity3d.ads:unity-ads:4.13.1")
+    implementation("com.google.ads.mediation:unity:4.13.1.0")
+    implementation("com.google.ads.mediation:facebook:6.18.0.0")
+}
+
+// --- 16 KB page size fix -----------------------------------------------
+// shared_preferences_android (pulled in transitively by the shared_preferences
+// plugin) bundles androidx.datastore, whose libdatastore_shared_counter.so is
+// only 16-KB-page-safe in datastore 1.1.7. Newer 1.2.x re-introduced an
+// unaligned .so, so we pin every datastore artifact to 1.1.7 explicitly.
+// See: https://github.com/flutter/flutter/issues/182898
+configurations.all {
+    resolutionStrategy {
+        force("androidx.datastore:datastore:1.1.7")
+        force("androidx.datastore:datastore-android:1.1.7")
+        force("androidx.datastore:datastore-core:1.1.7")
+        force("androidx.datastore:datastore-core-android:1.1.7")
+        force("androidx.datastore:datastore-preferences:1.1.7")
+        force("androidx.datastore:datastore-preferences-android:1.1.7")
+        force("androidx.datastore:datastore-preferences-core:1.1.7")
+    }
 }
