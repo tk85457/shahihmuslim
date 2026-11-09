@@ -1,7 +1,7 @@
 name: shahihmuslim
 description: "Sahih Muslim — Production Hadith App"
 publish_to: 'none'
-version: 1.4.8+13
+version: 1.4.9+14
 
 environment:
   sdk: ^3.10.7

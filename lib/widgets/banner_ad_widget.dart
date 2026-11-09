@@ -1,18 +1,17 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../core/ads/ad_free_service.dart';
 import '../core/ads/ad_service.dart';
 
 /// Production-ready banner ad widget.
 ///
 /// Features:
+/// - Supports 24-hour ad-free reward (AdFreeService)
 /// - Adaptive banner size (better CPM than fixed 320×50)
-/// - Smart backoff retry: 5 seconds fixed retry when no-fill/error
-/// - Zero UI impact when no ad — returns SizedBox.shrink()
-/// - Network-safe: does not query when offline
-/// - Automatically cancels retries when ad is loaded
-/// - Properly disposes ad on widget removal (low memory)
+/// - Smart backoff retry: 15s → 30s → 60s
+/// - Zero UI impact when no ad or when ad-free — returns SizedBox.shrink()
+/// - Properly disposes ad on widget removal or reward activation (low memory)
 /// - Pauses retry when app is backgrounded
 /// - Safe against mount/unmount races
 class BannerAdWidget extends StatefulWidget {
@@ -43,6 +42,7 @@ class _BannerAdWidgetState extends State<BannerAdWidget>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     AdService.canRequestAdsNotifier.addListener(_onConsentChanged);
+    AdFreeService.adFreeNotifier.addListener(_onAdFreeChanged);
     _checkConsentAndLoad();
   }
 
@@ -53,6 +53,10 @@ class _BannerAdWidgetState extends State<BannerAdWidget>
       // Pause retries while app is in background — saves battery / network.
       _retryTimer?.cancel();
     } else if (state == AppLifecycleState.resumed) {
+      // Check if 24h ad-free state changed while app was backgrounded
+      AdFreeService.refresh();
+      if (AdFreeService.isAdFree) return;
+
       // Resume: request a fresh ad if none is showing.
       if (!_isAdLoaded || _bannerAd == null) {
         _retryAttempt = 0;
@@ -66,8 +70,35 @@ class _BannerAdWidgetState extends State<BannerAdWidget>
     WidgetsBinding.instance.removeObserver(this);
     _retryTimer?.cancel();
     AdService.canRequestAdsNotifier.removeListener(_onConsentChanged);
+    AdFreeService.adFreeNotifier.removeListener(_onAdFreeChanged);
     _bannerAd?.dispose();
     super.dispose();
+  }
+
+  // ─── Ad-free reward ───────────────────────────────────────────────────────
+
+  /// Fires when the 24 h "banner ads off" window starts or ends.
+  void _onAdFreeChanged() {
+    if (!mounted) return;
+
+    if (AdFreeService.adFreeNotifier.value) {
+      // Reward granted: stop everything and free the ad's memory immediately.
+      _retryTimer?.cancel();
+      _retryTimer = null;
+      final old = _bannerAd;
+      setState(() {
+        _bannerAd = null;
+        _isAdLoaded = false;
+        _isLoadingAd = false;
+      });
+      old?.dispose();
+    } else {
+      // Reward expired: resume loading ads if needed.
+      if (_bannerAd == null && !_isLoadingAd) {
+        _retryAttempt = 0;
+        _loadAd();
+      }
+    }
   }
 
   // ─── Consent & Load ───────────────────────────────────────────────────────
@@ -75,9 +106,26 @@ class _BannerAdWidgetState extends State<BannerAdWidget>
   /// Fires when AdService consent state changes (e.g. UMP form completed).
   void _onConsentChanged() {
     if (!mounted) return;
-    if (_bannerAd == null && !_isAdLoaded && !_isLoadingAd) {
-      _loadAd();
+    // Only react once the whole consent + SDK init flow has FINISHED, so the
+    // first banner request never overlaps with MobileAds.initialize().
+    if (AdService.isConsentGathered) {
+      _scheduleFirstLoad();
     }
+  }
+
+  bool _firstLoadScheduled = false;
+
+  /// ANR FIX: first banner request is delayed a little after SDK init so the
+  /// main thread is not hit by init + AdView creation + first touch at once.
+  void _scheduleFirstLoad() {
+    if (_firstLoadScheduled || _bannerAd != null || _isAdLoaded) return;
+    _firstLoadScheduled = true;
+    _retryTimer?.cancel();
+    _retryTimer = Timer(const Duration(milliseconds: 2500), () {
+      if (mounted && !_isAdLoaded && !_isLoadingAd) {
+        _loadAd();
+      }
+    });
   }
 
   /// Entry point called from initState — waits for consent then loads.
@@ -87,12 +135,12 @@ class _BannerAdWidgetState extends State<BannerAdWidget>
       await AdService.waitForConsent();
       if (!mounted) return;
     }
-    _loadAd();
+    _scheduleFirstLoad();
   }
 
   /// Resolves adaptive banner size once, then creates and loads the BannerAd.
   Future<void> _loadAd() async {
-    if (!AdService.isSupported || _isLoadingAd) return;
+    if (!AdService.isSupported || _isLoadingAd || AdFreeService.isAdFree) return;
     _isLoadingAd = true;
     _retryTimer?.cancel();
 
@@ -110,81 +158,76 @@ class _BannerAdWidgetState extends State<BannerAdWidget>
       return;
     }
 
-    // Network check: agar internet band ho toh bekaar me request na bheje
-    try {
-      final lookup = await InternetAddress.lookup('google.com')
-          .timeout(const Duration(seconds: 3));
-      if (lookup.isEmpty || lookup[0].rawAddress.isEmpty) {
-        _isLoadingAd = false;
-        _scheduleRetry();
-        return;
-      }
-    } catch (_) {
-      _isLoadingAd = false;
-      _scheduleRetry();
-      return;
-    }
-
-    if (!mounted) {
-      _isLoadingAd = false;
-      return;
-    }
-
     final unitId = widget.adUnitId ?? AdService.bannerAdUnitId;
     final size = _resolvedSize ?? AdSize.banner;
 
-    BannerAd(
-      adUnitId: unitId,
-      request: const AdRequest(),
-      size: size,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          if (!mounted) {
+    try {
+      BannerAd(
+        adUnitId: unitId,
+        request: const AdRequest(),
+        size: size,
+        listener: BannerAdListener(
+          onAdLoaded: (ad) {
+            if (!mounted) {
+              ad.dispose();
+              return;
+            }
+            final old = _bannerAd;
+            setState(() {
+              _bannerAd = ad as BannerAd;
+              _isAdLoaded = true;
+              _isLoadingAd = false;
+            });
+            old?.dispose();
+
+            // Rule: Jab ad fill ho jaye, toh saara retry completely BAND!
+            _retryAttempt = 0;
+            _retryTimer?.cancel();
+            _retryTimer = null;
+          },
+          onAdFailedToLoad: (ad, err) {
+            debugPrint('BannerAd ($unitId) failed [${err.code}]: ${err.message}');
             ad.dispose();
-            return;
-          }
-          final old = _bannerAd;
-          setState(() {
-            _bannerAd = ad as BannerAd;
-            _isAdLoaded = true;
+            if (!mounted) return;
             _isLoadingAd = false;
-          });
-          old?.dispose();
 
-          // Rule: Jab ad fill ho jaye, toh saara retry completely BAND!
-          _retryAttempt = 0;
-          _retryTimer?.cancel();
-          _retryTimer = null;
-        },
-        onAdFailedToLoad: (ad, err) {
-          debugPrint('BannerAd ($unitId) failed [${err.code}]: ${err.message}');
-          ad.dispose();
-          if (!mounted) return;
+            // Agar pehle se koi ad visible hai, usse rehne dein
+            if (_bannerAd != null && _isAdLoaded) return;
+
+            setState(() {
+              _isAdLoaded = false;
+              _bannerAd = null;
+            });
+
+            // Rule: Agar ad na dikhe ya no-fill ho, toh 5 second baad retry kare
+            _scheduleRetry();
+          },
+        ),
+      ).load();
+    } catch (e) {
+      debugPrint('Exception creating/loading BannerAd ($unitId): $e');
+      if (mounted) {
+        setState(() {
           _isLoadingAd = false;
-
-          // Agar pehle se koi ad visible hai, usse rehne dein
-          if (_bannerAd != null && _isAdLoaded) return;
-
-          setState(() {
-            _isAdLoaded = false;
-            _bannerAd = null;
-          });
-
-          // Rule: Agar ad na dikhe ya no-fill ho, toh 5 second baad retry kare
-          _scheduleRetry();
-        },
-      ),
-    ).load();
+          _isAdLoaded = false;
+          _bannerAd = null;
+        });
+        _scheduleRetry();
+      }
+    }
   }
 
-  /// 5 second fixed retry: sirf tab chale jab koi ad loaded NA ho
+  /// Exponential backoff retry: 15s -> 30s -> 60s (prevents ad network rate-limiting)
   void _scheduleRetry() {
     _retryTimer?.cancel();
     if (_isAdLoaded && _bannerAd != null) return;
 
     _retryAttempt++;
-    debugPrint('BannerAd retry #$_retryAttempt scheduled in 5 seconds...');
-    _retryTimer = Timer(const Duration(seconds: 5), () {
+    const retryDelays = [15, 30, 60, 120, 300];
+    final delaySeconds =
+        retryDelays[(_retryAttempt - 1).clamp(0, retryDelays.length - 1)];
+    debugPrint('BannerAd retry #$_retryAttempt scheduled in ${delaySeconds}s...');
+    _retryTimer = Timer(Duration(seconds: delaySeconds), () {
       if (mounted && !_isAdLoaded) {
         _loadAd();
       }
@@ -195,9 +238,8 @@ class _BannerAdWidgetState extends State<BannerAdWidget>
 
   @override
   Widget build(BuildContext context) {
-    // Return zero-size widget while loading or when no fill —
-    // UI layout remains completely unchanged.
-    if (!AdService.isSupported || !_isAdLoaded || _bannerAd == null) {
+    // Return zero-size widget while loading, when no fill, or when 24h ad-free is active.
+    if (!AdService.isSupported || AdFreeService.isAdFree || !_isAdLoaded || _bannerAd == null) {
       return const SizedBox.shrink();
     }
 

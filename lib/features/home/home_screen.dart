@@ -11,7 +11,8 @@ import '../../data/repositories/hadith_repository.dart';
 import '../../domain/models/models.dart';
 import '../settings/settings_provider.dart';
 import '../common/widgets/shimmer_loading.dart';
-import '../../core/ads/ad_service.dart';
+import '../../core/ads/ad_free_service.dart';
+import '../../widgets/ad_choice_dialog.dart';
 
 final chaptersProvider = FutureProvider<List<Chapter>>((ref) async {
   final repo = ref.watch(hadithRepositoryProvider);
@@ -78,28 +79,22 @@ class HomeScreen extends ConsumerWidget {
         ),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.volunteer_activism, color: Colors.amber),
-            tooltip: 'Support App (Watch Ad)',
-            onPressed: () {
-              HapticFeedback.heavyImpact();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Loading Rewarded Ad... Thank you! 💚'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-              AdService.showRewardedAd(
-                onUserEarnedReward: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('JazakAllah Khair! Thank you for supporting the app! 💚'),
-                      backgroundColor: Color(0xFF0A7E47),
-                    ),
-                  );
-                },
-              );
-            },
+          // Replaces the old "watch rewarded ad" icon: opens the 24h ad-free choice.
+          ValueListenableBuilder<bool>(
+            valueListenable: AdFreeService.adFreeNotifier,
+            builder: (context, adFree, _) => IconButton(
+              icon: Icon(
+                adFree ? Icons.verified_rounded : Icons.volunteer_activism,
+                color: adFree ? Colors.greenAccent : Colors.amber,
+              ),
+              tooltip: adFree
+                  ? 'Banner ads are off'
+                  : 'Remove banner ads for 24 hours',
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                AdChoiceDialog.show(context);
+              },
+            ),
           ),
           IconButton(
             icon: const Icon(Icons.settings),

@@ -8,6 +8,7 @@ import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'theme/app_theme.dart';
 import 'core/router.dart';
+import 'core/ads/ad_free_service.dart';
 import 'features/settings/settings_provider.dart';
 
 void main() {
@@ -52,6 +53,7 @@ class _Bootstrap extends StatelessWidget {
         if (prefs == null) {
           return const _BootLoading();
         }
+        AdFreeService.init(prefs); // 24h banner-free state must be known before first frame
         return ProviderScope(
           overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
           child: const SahihMuslimApp(),

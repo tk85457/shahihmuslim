@@ -32,6 +32,8 @@ class AdService {
 
   /// Test Banner Ad Unit ID for iOS
   static const String iosTestBannerId = 'ca-app-pub-3940256099942544/2934735716';
+  static const String iosTestRewardedId =
+      'ca-app-pub-3940256099942544/1712485313';
 
   /// Check if ads are supported on the current platform
   static bool get isSupported {
@@ -211,7 +213,7 @@ class AdService {
   /// Get appropriate Rewarded Ad Unit ID (production only)
   static String get rewardedAdUnitId {
     if (Platform.isAndroid) return androidProductionRewardedId;
-    return iosTestBannerId;
+    return iosTestRewardedId;
   }
 
   /// Helper to load & show Rewarded Ad (strictly gated by consent)
@@ -266,5 +268,87 @@ class AdService {
         },
       ),
     );
+  }
+
+  /// Loads a rewarded ad.
+  ///
+  /// Resolves with the ad, or `null` if it could not be loaded within
+  /// [timeout] (no fill, no network, ...). The caller owns the returned ad and
+  /// must either pass it to [showRewarded] or call `dispose()` on it.
+  static Future<RewardedAd?> loadRewarded({
+    Duration timeout = const Duration(seconds: 15),
+  }) async {
+    if (!isSupported) return null;
+
+    // Never request ads before the consent flow has finished.
+    try {
+      await waitForConsent().timeout(const Duration(seconds: 10));
+    } catch (_) {}
+
+    final completer = Completer<RewardedAd?>();
+    final timer = Timer(timeout, () {
+      if (!completer.isCompleted) completer.complete(null);
+    });
+
+    try {
+      RewardedAd.load(
+        adUnitId: rewardedAdUnitId,
+        request: const AdRequest(),
+        rewardedAdLoadCallback: RewardedAdLoadCallback(
+          onAdLoaded: (ad) {
+            if (completer.isCompleted) {
+              // Arrived after the timeout / caller gave up -> free the memory.
+              ad.dispose();
+              return;
+            }
+            completer.complete(ad);
+          },
+          onAdFailedToLoad: (err) {
+            debugPrint(
+              'RewardedAd failed to load [${err.code}]: ${err.message}',
+            );
+            if (!completer.isCompleted) completer.complete(null);
+          },
+        ),
+      );
+    } catch (e) {
+      debugPrint('RewardedAd.load threw: $e');
+      if (!completer.isCompleted) completer.complete(null);
+    }
+
+    final ad = await completer.future;
+    timer.cancel();
+    return ad;
+  }
+
+  /// Shows a previously loaded rewarded ad and disposes it afterwards.
+  ///
+  /// Resolves with `true` ONLY if the user actually earned the reward
+  /// (watched the ad to the end). Closing the ad early resolves with `false`.
+  static Future<bool> showRewarded(RewardedAd ad) {
+    final completer = Completer<bool>();
+    var earned = false;
+
+    ad.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (ad) {
+        ad.dispose();
+        if (!completer.isCompleted) completer.complete(earned);
+      },
+      onAdFailedToShowFullScreenContent: (ad, err) {
+        debugPrint('RewardedAd failed to show: ${err.message}');
+        ad.dispose();
+        if (!completer.isCompleted) completer.complete(false);
+      },
+    );
+
+    try {
+      ad.show(onUserEarnedReward: (_, _) => earned = true);
+    } catch (e) {
+      debugPrint('RewardedAd.show threw: $e');
+      ad.dispose();
+      if (!completer.isCompleted) completer.complete(false);
+    }
+
+    return completer.future;
   }
 }

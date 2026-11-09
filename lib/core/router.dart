@@ -15,6 +15,7 @@ import '../features/onboarding/onboarding_screen.dart';
 import '../features/onboarding/language_select_screen.dart';
 import '../features/privacy/privacy_policy_screen.dart';
 import '../widgets/banner_ad_widget.dart';
+import '../widgets/ad_choice_dialog.dart';
 
 class AppShell extends StatelessWidget {
   final Widget child;
@@ -26,7 +27,7 @@ class AppShell extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: child,
+      body: AdChoicePromptHost(child: child),
       // Persistent Adaptive Banner: Remains mounted across all app shell routes.
       // 1. Zero flicker/delay when switching screens.
       // 2. High Viewability & High eCPM (Continuous impression time counted by AdMob).
